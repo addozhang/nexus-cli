@@ -38,6 +38,9 @@ type RawAsset struct {
 	Checksums      map[string]string `json:"checksum,omitempty"`
 	LastModified   *TimeValue        `json:"lastModified,omitempty"`
 	LastDownloaded *TimeValue        `json:"lastDownloaded,omitempty"`
+	Uploader       string            `json:"uploader,omitempty"`
+	UploaderIP     string            `json:"uploaderIp,omitempty"`
+	BlobCreated    *TimeValue        `json:"blobCreated,omitempty"`
 }
 
 // RawComponent mirrors a component entry from the search API.

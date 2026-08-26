@@ -42,6 +42,27 @@ func Test_MapSearchResults(t *testing.T) {
 	}
 }
 
+func absentsToJSON(t *testing.T, v any) string {
+	t.Helper()
+	b, err := json.Marshal(v)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var m map[string]any
+	if err := json.Unmarshal(b, &m); err != nil {
+		t.Fatal(err)
+	}
+	comps := m["components"].([]any)
+	assets := comps[0].(map[string]any)["assets"].([]any)
+	asset := assets[0].(map[string]any)
+	for _, key := range []string{"uploader", "uploaderIp", "blobCreated"} {
+		if _, ok := asset[key]; !ok {
+			t.Errorf(`experimental key %q missing from JSON`, key)
+		}
+	}
+	return string(b)
+}
+
 func Test_MapVersionList_AggregatesAndSorts(t *testing.T) {
 	mod := time.Date(2026, 1, 2, 3, 4, 5, 0, time.UTC)
 	newer := mod.Add(time.Hour)
@@ -77,12 +98,16 @@ func Test_MapVersionList_AggregatesAndSorts(t *testing.T) {
 func Test_MapInfoResults_AssetsAndNotFound(t *testing.T) {
 	size := int64(42)
 	downloaded := nexus.TimeValue(time.Date(2026, 2, 1, 0, 0, 0, 0, time.UTC))
+	uploader := "deployer"
+	created := nexus.TimeValue(time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC))
 	raw := []nexus.RawComponent{{
 		ID: "c1", Name: "lib", Version: "1.0", Repository: "r", Format: "npm",
 		Assets: []nexus.RawAsset{{
 			Path:           "/p/lib.tgz",
 			Size:           &size,
 			Checksums:      map[string]string{"sha256": "aa"},
+			Uploader:       uploader,
+			BlobCreated:    &created,
 			LastDownloaded: &downloaded,
 		}},
 	}}
@@ -94,6 +119,22 @@ func Test_MapInfoResults_AssetsAndNotFound(t *testing.T) {
 	if a.Size == nil || *a.Size != 42 || a.Checksums["sha256"] != "aa" || a.LastDownloaded == nil {
 		t.Errorf("asset mapping wrong: %+v", a)
 	}
+	if a.Uploader != "deployer" {
+		t.Errorf("uploader = %q", a.Uploader)
+	}
+	if a.BlobCreated == nil || !a.BlobCreated.Equal(time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC)) {
+		t.Errorf("blobCreated = %v", a.BlobCreated)
+	}
+
+	// absent provenance fields render explicit nulls / zero values, not missing keys
+	absent, err := schema.MapInfoResults([]nexus.RawComponent{{
+		ID: "c2", Name: "lib2", Version: "1.0", Repository: "r",
+		Assets: []nexus.RawAsset{{Path: "/p/x"}},
+	}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	absentsToJSON(t, absent)
 
 	if _, err := schema.MapInfoResults(nil); err == nil {
 		t.Error("empty input should produce not-found error")

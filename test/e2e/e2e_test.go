@@ -214,6 +214,8 @@ func TestE2EMavenInfoAssetsAndChecksums(t *testing.T) {
 				Path           string            `json:"path"`
 				Size           *int64            `json:"size"`
 				Checksums      map[string]string `json:"checksums"`
+				Uploader       string            `json:"uploader"`
+				BlobCreated    *string           `json:"blobCreated"`
 				LastModified   *string           `json:"lastModified"`
 				LastDownloaded *string           `json:"lastDownloaded"`
 			} `json:"assets"`
@@ -246,6 +248,25 @@ func TestE2EMavenInfoAssetsAndChecksums(t *testing.T) {
 			if !strings.Contains(raw, `"lastDownloaded"`) {
 				t.Error(`stable key "lastDownloaded" missing from asset JSON`)
 			}
+		}
+	}
+
+	// Wire-assumption check: real instances expose upload provenance.
+	for _, a := range c.Assets {
+		if a.Uploader == "" {
+			t.Errorf("uploader missing on asset %q", a.Path)
+		}
+		if a.BlobCreated == nil || *a.BlobCreated == "" {
+			t.Errorf("blobCreated missing on asset %q", a.Path)
+		}
+	}
+	// Wire-assumption check: real instances expose upload provenance.
+	for _, a := range c.Assets {
+		if a.Uploader == "" {
+			t.Errorf("uploader missing on asset %q", a.Path)
+		}
+		if a.BlobCreated == nil || *a.BlobCreated == "" {
+			t.Errorf("blobCreated missing on asset %q", a.Path)
 		}
 	}
 	if !sawJar {

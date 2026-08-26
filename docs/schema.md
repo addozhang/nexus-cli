@@ -119,6 +119,9 @@ Each asset:
 | `path` | string | stable | repository-relative path |
 | `size` | integer \| null | stable | bytes; null when not reported |
 | `checksums` | map<string,string> | stable | algorithms as reported (sha1/sha256/md5/…) |
+| `uploader` | string \| null | experimental | user that uploaded the asset; null when the instance does not report it |
+| `uploaderIp` | string \| null | experimental | source IP of the upload; null when not reported |
+| `blobCreated` | timestamp \| null | experimental | time the asset entered the repository |
 | `lastModified` | timestamp \| null | stable | |
 | `lastDownloaded` | timestamp \| null | stable | explicit null when never downloaded |
 

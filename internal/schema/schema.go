@@ -146,11 +146,15 @@ func MapVersionList(group, name string, raw []nexus.RawComponent) *VersionList {
 
 // AssetInfo describes one archived asset of a component.
 type AssetInfo struct {
-	Path           string            `json:"path" yaml:"path"`
-	Size           *int64            `json:"size" yaml:"size"`
-	Checksums      map[string]string `json:"checksums" yaml:"checksums"`
-	LastModified   *time.Time        `json:"lastModified" yaml:"lastModified"`
-	LastDownloaded *time.Time        `json:"lastDownloaded" yaml:"lastDownloaded"`
+	Path      string            `json:"path" yaml:"path"`
+	Size      *int64            `json:"size" yaml:"size"`
+	Checksums map[string]string `json:"checksums" yaml:"checksums"`
+	// Experimental provenance fields; promoted to stable after one minor release.
+	Uploader       string     `json:"uploader" yaml:"uploader"`
+	UploaderIP     string     `json:"uploaderIp" yaml:"uploaderIp"`
+	BlobCreated    *time.Time `json:"blobCreated" yaml:"blobCreated"`
+	LastModified   *time.Time `json:"lastModified" yaml:"lastModified"`
+	LastDownloaded *time.Time `json:"lastDownloaded" yaml:"lastDownloaded"`
 }
 
 // ComponentInfo is one component occurrence in one repository, with assets.
@@ -194,6 +198,9 @@ func MapInfoResults(raw []nexus.RawComponent) (*InfoResults, error) {
 				Path:           a.Path,
 				Size:           size,
 				Checksums:      checksums,
+				Uploader:       a.Uploader,
+				UploaderIP:     a.UploaderIP,
+				BlobCreated:    nexus.AsTime(a.BlobCreated),
 				LastModified:   nexus.AsTime(a.LastModified),
 				LastDownloaded: nexus.AsTime(a.LastDownloaded),
 			})

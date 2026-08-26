@@ -164,6 +164,9 @@ func component(id, name, version, repo string, assets bool) map[string]any {
 			"path":           "/" + name + "/-/" + name + "-" + version + ".tgz",
 			"fileSize":       1234,
 			"checksum":       map[string]any{"sha1": "abc", "sha256": "def"},
+			"uploader":       "admin",
+			"uploaderIp":     "192.168.1.10",
+			"blobCreated":    "2025-12-31T00:00:00.000+0000",
 			"lastModified":   "2026-01-02T03:04:05.000+0000",
 			"lastDownloaded": nil,
 		}}
@@ -284,6 +287,9 @@ func TestInfoDetailAndNotFound(t *testing.T) {
 				Path           string            `json:"path"`
 				Size           *int64            `json:"size"`
 				Checksums      map[string]string `json:"checksums"`
+				Uploader       string            `json:"uploader"`
+				UploaderIP     string            `json:"uploaderIp"`
+				BlobCreated    *string           `json:"blobCreated"`
 				LastDownloaded any               `json:"lastDownloaded"`
 			} `json:"assets"`
 		} `json:"components"`
@@ -300,6 +306,9 @@ func TestInfoDetailAndNotFound(t *testing.T) {
 	}
 	if asset.Checksums["sha256"] != "def" || asset.Size == nil || *asset.Size != 1234 {
 		t.Errorf("asset metadata wrong: %+v", asset)
+	}
+	if asset.Uploader != "admin" || asset.UploaderIP != "192.168.1.10" || asset.BlobCreated == nil {
+		t.Errorf("provenance fields wrong: %+v", asset)
 	}
 
 	_, err = runNX(t, "npm", "info", "lodash")
