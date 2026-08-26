@@ -19,6 +19,6 @@ jobs:
       - name: Integration tests
         run: go test ./test/integration/... -race
       - name: Lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v7
         with:
           version: v2.12
