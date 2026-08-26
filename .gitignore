@@ -1,0 +1,9 @@
+# build artifacts
+/bin/
+coverage.out
+
+# local tooling
+node_modules/
+
+# os noise
+.DS_Store

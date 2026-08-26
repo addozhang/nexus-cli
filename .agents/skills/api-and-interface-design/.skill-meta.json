@@ -1,0 +1,13 @@
+{
+  "sourceType": "github",
+  "source": "github",
+  "url": "https://github.com/addyosmani/agent-skills",
+  "repo": "addyosmani/agent-skills",
+  "ref": null,
+  "subpath": "skills/api-and-interface-design",
+  "installSource": "addyosmani/agent-skills/skills/api-and-interface-design",
+  "skillName": "api-and-interface-design",
+  "scope": "project",
+  "installedAt": "2026-08-26T03:19:58.996Z",
+  "updatedAt": "2026-08-26T03:19:58.996Z"
+}

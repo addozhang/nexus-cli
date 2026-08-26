@@ -1,0 +1,13 @@
+{
+  "sourceType": "github",
+  "source": "github",
+  "url": "https://github.com/addyosmani/agent-skills",
+  "repo": "addyosmani/agent-skills",
+  "ref": null,
+  "subpath": "skills/deprecation-and-migration",
+  "installSource": "addyosmani/agent-skills/skills/deprecation-and-migration",
+  "skillName": "deprecation-and-migration",
+  "scope": "project",
+  "installedAt": "2026-08-26T03:19:59.000Z",
+  "updatedAt": "2026-08-26T03:19:59.000Z"
+}
