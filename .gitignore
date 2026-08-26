@@ -7,3 +7,7 @@ node_modules/
 
 # os noise
 .DS_Store
+
+# local agent workflow scaffolding
+.agents/
+.opencode/
