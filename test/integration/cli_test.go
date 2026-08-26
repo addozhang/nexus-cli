@@ -162,8 +162,8 @@ func component(id, name, version, repo string, assets bool) map[string]any {
 	if assets {
 		c["assets"] = []map[string]any{{
 			"path":           "/" + name + "/-/" + name + "-" + version + ".tgz",
-			"size":           1234,
-			"checksums":      map[string]any{"sha1": "abc", "sha256": "def"},
+			"fileSize":       1234,
+			"checksum":       map[string]any{"sha1": "abc", "sha256": "def"},
 			"lastModified":   "2026-01-02T03:04:05.000+0000",
 			"lastDownloaded": nil,
 		}}

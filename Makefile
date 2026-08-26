@@ -36,6 +36,9 @@ e2e-test: ## Run e2e tests against the container from e2e-up
 lint: ## golangci-lint run (zero warnings required)
 	golangci-lint run ./...
 
+release-snapshot: ## Local cross-platform snapshot build via GoReleaser
+	goreleaser release --snapshot --clean
+
 fmt: ## gofmt -s and goimports
 	gofmt -s -w .
 	$(GO) run golang.org/x/tools/cmd/goimports@latest -w .
