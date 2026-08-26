@@ -169,4 +169,19 @@ PY
 seed_maven 1.0.0
 seed_maven 1.1.0
 
+# Search indexing is asynchronous on a freshly booted instance; wait until
+# the seeded components become visible before letting the suite run.
+echo "waiting for search index..."
+for _ in $(seq 1 60); do
+  count=$(curl -s -u "admin:${PASS}" \
+    "$BASE/service/rest/v1/search?q=e2e&format=maven2" |
+    python3 -c 'import sys,json; print(len(json.load(sys.stdin).get("items", [])))' || echo 0)
+  [ "$count" -ge 2 ] && break
+  sleep 2
+done
+if [ "${count:-0}" -lt 2 ]; then
+  echo "error: seeded components never became searchable" >&2
+  exit 1
+fi
+
 echo "e2e environment ready at ${BASE}"
