@@ -30,7 +30,8 @@ PyPI, Cargo, Go, and Docker — all from the terminal, without opening a browser
 
 ## Disclaimer
 
-This project started as a hands-on study of the Nexus Repository 3 RESTful API and as a testbed for driving such a CLI from AI coding agents. Every command is a read-only query, but the credentials `nx` holds may hold more power than `nx` ever uses — in production, scope the account to read-only and manage permissions tightly.
+> [!WARNING]
+> This project started as a hands-on study of the Nexus Repository 3 RESTful API and as a testbed for driving such a CLI from AI coding agents. Every command is a read-only query, but the credentials `nx` holds may hold more power than `nx` ever uses — in production, scope the account to read-only and manage permissions tightly.
 
 ## Install
 
