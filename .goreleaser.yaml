@@ -27,6 +27,21 @@ archives:
 checksum:
   name_template: "checksums.txt"
 
+homebrew_casks:
+  - name: nx
+    ids:
+      - nx
+    binaries:
+      - nx
+    repository:
+      owner: addozhang
+      name: homebrew-tap
+      # Uses HOMEBREW_TAP_GITHUB_TOKEN secret in the release workflow.
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    directory: Casks
+    homepage: "https://github.com/addozhang/nexus-cli"
+    description: "Read-only query CLI for Sonatype Nexus Repository 3"
+
 snapshot:
   version_template: "{{ incpatch .Version }}-next"
 
