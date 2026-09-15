@@ -14,12 +14,14 @@ import (
 	nxerrors "github.com/addozhang/nexus-cli/internal/errors"
 )
 
-// Instance is one registered Nexus instance.
+// Instance is one registered Nexus instance. Secure instances keep their
+// token in the OS keyring (Token stays empty on disk).
 type Instance struct {
 	URL      string `toml:"url"`
 	Username string `toml:"username"`
 	Token    string `toml:"token"`
 	Default  bool   `toml:"default"`
+	Secure   bool   `toml:"secure,omitempty"`
 }
 
 // storeFile is the on-disk layout of the credentials file.
@@ -83,22 +85,41 @@ func (s *Store) Save() error {
 }
 
 // Add registers or replaces an instance. When def is true other instances'
-// default markers are cleared.
-func (s *Store) Add(alias, url, username, token string, def bool) error {
+// default markers are cleared. With secure set, the token is stored in the OS
+// keyring under the alias and not persisted to the credentials file; the
+// keyring write happens before the file is touched.
+func (s *Store) Add(alias, url, username, token string, def, secure bool) error {
 	if alias == "" {
 		return nxerrors.New(nxerrors.ClassFlag, "alias is required")
+	}
+	if prev, ok := s.instances[alias]; ok && prev.Secure && !secure {
+		deleteToken(alias)
+	}
+	if secure {
+		if err := storeToken(alias, token); err != nil {
+			return err
+		}
 	}
 	if def {
 		s.clearDefaults()
 	}
-	s.instances[alias] = Instance{URL: normalizeURL(url), Username: username, Token: token, Default: def}
+	inst := Instance{URL: normalizeURL(url), Username: username, Default: def, Secure: secure}
+	if !secure {
+		inst.Token = token
+	}
+	s.instances[alias] = inst
 	return s.Save()
 }
 
-// Remove deletes an instance; removing the default clears the marker.
+// Remove deletes an instance; removing the default clears the marker. The
+// keyring entry of a secure instance is deleted best effort.
 func (s *Store) Remove(alias string) error {
-	if _, ok := s.instances[alias]; !ok {
+	inst, ok := s.instances[alias]
+	if !ok {
 		return nxerrors.New(nxerrors.ClassInstance, "unknown instance %q (known: %s)", alias, s.AliasList())
+	}
+	if inst.Secure {
+		deleteToken(alias)
 	}
 	delete(s.instances, alias)
 	return s.Save()
@@ -166,7 +187,11 @@ func (i Instance) String(alias string) string {
 	if i.Default {
 		marker = " (default)"
 	}
-	return fmt.Sprintf("%s: %s as %s%s", alias, i.URL, i.Username, marker)
+	secure := ""
+	if i.Secure {
+		secure = " (keyring)"
+	}
+	return fmt.Sprintf("%s: %s as %s%s%s", alias, i.URL, i.Username, marker, secure)
 }
 
 func normalizeURL(u string) string { return strings.TrimRight(strings.TrimSpace(u), "/") }

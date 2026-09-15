@@ -41,6 +41,11 @@ Precedence order at query time:
 Credentials live in `~/.config/nx/credentials` (TOML, mode `0600`). Tokens are
 never printed by any command.
 
+Instances registered with `nx auth add --secure-storage` (or
+`NX_SECURE_STORAGE=1`) keep their token in the OS keyring instead; the
+credentials file then records only `secure = true` for that alias, and
+`nx auth list` marks it with `(keyring)`.
+
 TLS: system roots by default; set `SSL_CERT_FILE` to a PEM bundle for
 self-signed CAs; `--insecure` disables verification with a stderr warning.
 

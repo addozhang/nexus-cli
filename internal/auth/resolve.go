@@ -36,7 +36,11 @@ func Resolve(store *Store, aliasFlag string) (*Resolved, error) {
 		if !ok {
 			return nil, nxerrors.New(nxerrors.ClassInstance, "unknown instance %q (known: %s)", aliasFlag, store.AliasList())
 		}
-		return &Resolved{Alias: aliasFlag, BaseURL: inst.URL, Username: inst.Username, Token: inst.Token}, nil
+		token, err := store.Token(aliasFlag)
+		if err != nil {
+			return nil, err
+		}
+		return &Resolved{Alias: aliasFlag, BaseURL: inst.URL, Username: inst.Username, Token: token}, nil
 	}
 
 	if url, user, token, ok := envOverride(); ok {
@@ -52,7 +56,11 @@ func Resolve(store *Store, aliasFlag string) (*Resolved, error) {
 		)
 	}
 	inst, _ := store.Get(alias)
-	return &Resolved{Alias: alias, BaseURL: inst.URL, Username: inst.Username, Token: inst.Token}, nil
+	token, err := store.Token(alias)
+	if err != nil {
+		return nil, err
+	}
+	return &Resolved{Alias: alias, BaseURL: inst.URL, Username: inst.Username, Token: token}, nil
 }
 
 func envOverride() (string, string, string, bool) {

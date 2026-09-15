@@ -75,8 +75,8 @@ func TestAuthRemoveAndDefaultLifecycle(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_ = store.Add("a", f.URL, "u", "t", true)
-	_ = store.Add("b", f.URL, "u", "t", false)
+	_ = store.Add("a", f.URL, "u", "t", true, false)
+	_ = store.Add("b", f.URL, "u", "t", false, false)
 
 	_, err = runNX(t, "repo", "list") // default = a; server reachable
 	if err != nil {

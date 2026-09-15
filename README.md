@@ -97,6 +97,23 @@ nx auth remove <alias>
 Credentials live in `~/.config/nx/credentials` (TOML, mode `0600`). Tokens are
 never printed by any command.
 
+### OS keyring storage
+
+By default tokens are written to the credentials file. To keep the token in
+the operating system keyring instead (macOS Keychain, Windows Credential
+Manager, Linux Secret Service):
+
+```sh
+nx auth add prod --secure-storage
+# or opt in per shell: export NX_SECURE_STORAGE=1
+```
+
+The token is then stored under the instance alias in the OS keyring and never
+touchs the credentials file — the file only records `secure = true` for that
+alias, and `nx auth list` marks secure instances with `(keyring)`. Re-running
+`nx auth add <alias>` without `--secure-storage` moves the token back to the
+file and deletes the keyring entry; `nx auth remove <alias>` deletes both.
+
 Resolution order at query time:
 
 1. `--instance <alias>` flag

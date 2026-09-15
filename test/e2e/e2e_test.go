@@ -69,7 +69,7 @@ func requireInstance(t *testing.T) string {
 		t.Fatalf("load store: %v", err)
 	}
 	if _, ok := store.Get(instanceAlias); !ok {
-		if err := store.Add(instanceAlias, url, user, pass, true); err != nil {
+		if err := store.Add(instanceAlias, url, user, pass, true, false); err != nil {
 			t.Fatalf("register instance: %v", err)
 		}
 	}

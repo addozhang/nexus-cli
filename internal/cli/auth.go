@@ -23,8 +23,11 @@ func newAuthCmd() *cobra.Command {
 	return cmd
 }
 
+// envSecureStorage opts into keyring storage for `auth add` when set to "1".
+const envSecureStorage = "NX_SECURE_STORAGE"
+
 func newAuthAddCmd() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "add <alias>",
 		Short: "Register an instance (alias, URL, username, token) and verify connectivity",
 		Args:  cobra.ExactArgs(1),
@@ -58,18 +61,32 @@ func newAuthAddCmd() *cobra.Command {
 					"verification against %s failed; credentials were NOT saved", url)
 			}
 
+			secureStorage, _ := cmd.Flags().GetBool("secure-storage")
+			secure := secureStorageWanted(secureStorage)
 			def := len(store.Aliases()) == 0
-			if err := store.Add(alias, url, username, token, def); err != nil {
+			if err := store.Add(alias, url, username, token, def, secure); err != nil {
 				return err
 			}
 			extra := ""
 			if def {
 				extra = " (set as default — first instance registered)"
 			}
+			if secure {
+				extra += " — token stored in the OS keyring"
+			}
 			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "Instance %q saved.%s\n", alias, extra)
 			return nil
 		},
 	}
+	cmd.Flags().Bool("secure-storage", false,
+		"store the token in the OS keyring instead of the credentials file (also "+envSecureStorage+"=1)")
+	return cmd
+}
+
+// secureStorageWanted combines the --secure-storage flag with its
+// NX_SECURE_STORAGE=1 environment fallback.
+func secureStorageWanted(flag bool) bool {
+	return flag || os.Getenv(envSecureStorage) == "1"
 }
 
 func newAuthListCmd() *cobra.Command {

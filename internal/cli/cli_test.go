@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+	"os"
 	"testing"
 
 	nxerrors "github.com/addozhang/nexus-cli/internal/errors"
@@ -22,6 +23,35 @@ func Test_ExitCode_NxErrorsAreTen(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := ExitCode(tt.err); got != tt.want {
 				t.Errorf("ExitCode = %d, want %d", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_SecureStorageWanted_FlagOrEnv(t *testing.T) {
+	tests := []struct {
+		name string
+		env  string
+		flag bool
+		want bool
+	}{
+		{"neither", "", false, false},
+		{"flag only", "", true, true},
+		{"env 1", "1", false, true},
+		{"env 0 ignored", "0", false, false},
+		{"env true ignored", "true", false, false},
+		{"env wins with flag off", "1", false, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.env == "" {
+				t.Setenv("NX_SECURE_STORAGE", "")
+				os.Unsetenv("NX_SECURE_STORAGE")
+			} else {
+				t.Setenv("NX_SECURE_STORAGE", tt.env)
+			}
+			if got := secureStorageWanted(tt.flag); got != tt.want {
+				t.Errorf("secureStorageWanted(%v) with env %q = %v, want %v", tt.flag, tt.env, got, tt.want)
 			}
 		})
 	}

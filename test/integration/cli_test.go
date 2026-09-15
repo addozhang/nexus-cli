@@ -66,7 +66,7 @@ func seedInstance(t *testing.T, url string) {
 	if err != nil {
 		t.Fatalf("seed store: %v", err)
 	}
-	if err := store.Add("test", url, "user", "token", true); err != nil {
+	if err := store.Add("test", url, "user", "token", true, false); err != nil {
 		t.Fatalf("seed add: %v", err)
 	}
 }

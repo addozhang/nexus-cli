@@ -27,7 +27,7 @@ func Test_Store_AddSaveLoadRoundTrip(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Load: %v", err)
 	}
-	if err := s.Add("prod", "https://nexus.example.com:8443/", "deployer", "tok", true); err != nil {
+	if err := s.Add("prod", "https://nexus.example.com:8443/", "deployer", "tok", true, false); err != nil {
 		t.Fatalf("Add: %v", err)
 	}
 	info, err := os.Stat(path)
@@ -59,10 +59,10 @@ func Test_Store_AddSaveLoadRoundTrip(t *testing.T) {
 
 func Test_Store_SetDefaultClearsOthers(t *testing.T) {
 	s := newTestStore(t)
-	if err := s.Add("a", "http://a", "u", "t", true); err != nil {
+	if err := s.Add("a", "http://a", "u", "t", true, false); err != nil {
 		t.Fatal(err)
 	}
-	if err := s.Add("b", "http://b", "u", "t", false); err != nil {
+	if err := s.Add("b", "http://b", "u", "t", false, false); err != nil {
 		t.Fatal(err)
 	}
 	if err := s.SetDefault("b"); err != nil {
@@ -99,7 +99,7 @@ func Test_Store_MissingFileIsEmptyStore(t *testing.T) {
 
 func Test_Store_RemoveDefaultClearsMarker(t *testing.T) {
 	s := newTestStore(t)
-	_ = s.Add("dev", "http://dev", "u", "t", true)
+	_ = s.Add("dev", "http://dev", "u", "t", true, false)
 	if err := s.Remove("dev"); err != nil {
 		t.Fatalf("Remove: %v", err)
 	}
@@ -110,10 +110,10 @@ func Test_Store_RemoveDefaultClearsMarker(t *testing.T) {
 
 func Test_Resolve_ExplicitFlagWinsOverEverything(t *testing.T) {
 	s := newTestStore(t)
-	if err := s.Add("dev", "http://dev", "u", "t", true); err != nil {
+	if err := s.Add("dev", "http://dev", "u", "t", true, false); err != nil {
 		t.Fatal(err)
 	}
-	if err := s.Add("prod", "http://prod", "u2", "t2", false); err != nil {
+	if err := s.Add("prod", "http://prod", "u2", "t2", false, false); err != nil {
 		t.Fatal(err)
 	}
 
@@ -132,7 +132,7 @@ func Test_Resolve_ExplicitFlagWinsOverEverything(t *testing.T) {
 
 func Test_Resolve_EnvOverrideWhenNoFlag(t *testing.T) {
 	s := newTestStore(t)
-	if err := s.Add("dev", "http://dev", "u", "t", true); err != nil {
+	if err := s.Add("dev", "http://dev", "u", "t", true, false); err != nil {
 		t.Fatal(err)
 	}
 
@@ -151,7 +151,7 @@ func Test_Resolve_EnvOverrideWhenNoFlag(t *testing.T) {
 
 func Test_Resolve_PartialEnvIgnored(t *testing.T) {
 	s := newTestStore(t)
-	if err := s.Add("dev", "http://dev", "u", "t", true); err != nil {
+	if err := s.Add("dev", "http://dev", "u", "t", true, false); err != nil {
 		t.Fatal(err)
 	}
 	t.Setenv(auth.EnvURL, "http://env")
@@ -169,7 +169,7 @@ func Test_Resolve_PartialEnvIgnored(t *testing.T) {
 
 func Test_Resolve_NoDefaultErrorsListingAliases(t *testing.T) {
 	s := newTestStore(t)
-	if err := s.Add("a", "http://a", "u", "t", false); err != nil {
+	if err := s.Add("a", "http://a", "u", "t", false, false); err != nil {
 		t.Fatal(err)
 	}
 	_, err := auth.Resolve(s, "")
